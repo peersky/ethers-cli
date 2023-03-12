@@ -10,7 +10,7 @@
     "directory": "/"
   },
   "bin": {
-    "ethers-cli": "./scripts.js"
+    "ethscripts": "./scripts.js"
   },
   "license": "MIT",
   "dependencies": {
