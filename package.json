@@ -1,0 +1,17 @@
+{
+  "name": "ethers-scripts",
+  "version": "1.0.0",
+  "description": "Useful scripts for interacting with ethers wallet",
+  "main": "scripts.js",
+  "author": "Tim Pechersky ",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/peersky/ethers-cli.git",
+    "directory": "/"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "ethers": "5.4.0",
+    "yargs": "^17.7.1"
+  }
+}
