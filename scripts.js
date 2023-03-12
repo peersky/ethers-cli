@@ -93,7 +93,6 @@ yargs(hideBin(process.argv))
     (argv) => {
       const depth = argv.depth ?? 10;
       console.log("argv.mnemonic", argv.mnemonic);
-      if (!process.env.MNEMONIC) throw new Error("no mnemonic");
       const wallet = new ethers.Wallet.fromMnemonic(argv.mnemonic);
       for (let i = 0; i < depth; i++) {
         const walletIdx = ethers.Wallet.fromMnemonic(
