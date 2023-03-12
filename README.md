@@ -3,15 +3,14 @@
 This cli tool allows you to interact with ethers js and blockchain and has following methods
 
 ```
-scripts.js [command]
+ethers-cli [command]
 
 Commands:
-scripts.js randomWallet create random wallet mnemonic
-scripts.js transaction create transaction
-scripts.js getAccounts gets accounts of a mnemonic
-scripts.js findPK takes an account address and mnemonic and finds
-matching private key
-scripts.js fundWallets fund wallets
+ethers-cli randomWallet create random wallet mnemonic
+ethers-cli transaction create transaction
+ethers-cli getAccounts gets accounts of a mnemonic
+ethers-cli findPK takes an account address and mnemonic and finds matching private key
+ethers-cli fundWallets fund wallets
 
 Options:
 --help Show help [boolean]
