@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const ethers = require("ethers");
 const yargs = require("yargs/yargs");
 const { hideBin } = require("yargs/helpers");
@@ -60,14 +61,17 @@ yargs(hideBin(process.argv))
       );
     },
     async (argv) => {
-      console.log(typeof argv.arguments[2])
+      console.log(typeof argv.arguments[2]);
       const provider = new ethers.providers.JsonRpcProvider(argv.RPC);
-      const signer = new ethers.Wallet(argv.signer,provider);
+      const signer = new ethers.Wallet(argv.signer, provider);
       if (ethers.utils.isAddress(argv.contractAddress)) {
-        const contract = new ethers.Contract(argv.contractAddress,[`function ${argv.signature}`],signer)
+        const contract = new ethers.Contract(
+          argv.contractAddress,
+          [`function ${argv.signature}`],
+          signer
+        );
         const tx = await contract.functions[argv.signature](...argv.arguments);
-        console.log('transactions hash:', tx?.hash);
-
+        console.log("transactions hash:", tx?.hash);
       } else {
         console.error("not an address:", contractAddress);
       }
