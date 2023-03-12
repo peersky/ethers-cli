@@ -1,5 +1,5 @@
 {
-  "name": "ethers-cli",
+  "name": "ethscripts",
   "version": "1.0.3",
   "description": "Useful scripts for interacting with ethers wallet",
   "main": "scripts.js",
