@@ -1,6 +1,6 @@
 {
   "name": "ethscripts",
-  "version": "1.0.6",
+  "version": "1.2.0",
   "description": "Useful scripts for interacting with ethers wallet",
   "main": "scripts.js",
   "author": "Tim Pechersky ",
@@ -16,5 +16,9 @@
   "dependencies": {
     "ethers": "5.4.0",
     "yargs": "^17.7.1"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.26.2",
+    "changeset": "^0.2.6"
   }
 }

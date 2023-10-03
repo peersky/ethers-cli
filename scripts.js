@@ -111,16 +111,20 @@ yargs(hideBin(process.argv))
         .string("mnemonic")
         .string("account")
         .positional("account", { describe: "account PK of which need to find" })
-        .positional("mnemonic", { describe: "wallet mnemonic" })
+        .positional("mnemonic", {
+          describe:
+            "wallet mnemonic. Optionally you can set up MNEMONIC enviroment variable",
+        })
         .positional("depth", {
           describe: "number of accounts check",
           default: 10,
         })
-        .demandOption(["mnemonic", "account"]);
+        .demandOption(["account"]);
     },
     (argv) => {
       const depth = argv.depth ?? 10;
-      if (!process.env.MNEMONIC) throw new Error("no mnemonic");
+      const mnemonic = argv?.mnemonic ?? process.env?.MNEMONIC;
+      if (!mnemonic) throw new Error("no mnemonic");
       const wallet = new ethers.Wallet.fromMnemonic(argv.mnemonic);
       let finding;
       for (let i = 0; i < depth; i++) {
@@ -131,6 +135,21 @@ yargs(hideBin(process.argv))
         walletIdx.address == argv.account && (finding = walletIdx.privateKey);
       }
       console.log(finding ?? "Private key not found");
+    }
+  )
+  .command(
+    "fromPK",
+    "Returns address from a given Private key",
+    (yargs) => {
+      return yargs.string("pk").positional("pk", {
+        describe:
+          "private key. Alternatively set PRIVATE_KEY enviroment variable",
+      });
+    },
+    (argv) => {
+      const pk = argv?.pk ?? process.env?.PRIVATE_KEY;
+      const wallet = new ethers.Wallet(pk);
+      console.log(wallet.address);
     }
   )
   .command(
