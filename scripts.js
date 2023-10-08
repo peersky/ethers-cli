@@ -3,34 +3,12 @@ const ethers = require("ethers");
 const yargs = require("yargs/yargs");
 const { hideBin } = require("yargs/helpers");
 
-// const argv = yargs(hideBin(process.argv)).argv
+const yargsInstance = yargs(hideBin(process.argv));
 
-yargs(hideBin(process.argv))
+yargsInstance
+  .wrap(yargsInstance.terminalWidth())
   .command(
     "randomWallet",
-    "create random wallet mnemonic",
-    (yargs) => {
-      return yargs.positional("depth", {
-        describe: "number of accounts to generate",
-        default: 10,
-      });
-    },
-    (argv) => {
-      const wallet = ethers.Wallet.createRandom();
-      console.log("************MNEMONIC**************");
-      console.log(wallet.mnemonic);
-      for (let i = 0; i < argv.depth; i++) {
-        const walletIdx = ethers.Wallet.fromMnemonic(
-          wallet.mnemonic.phrase,
-          `m/44'/60'/0'/0/${i}`
-        );
-        console.log(walletIdx.address);
-      }
-      console.log("**********************************");
-    }
-  )
-  .command(
-    "randomMnemonic",
     "create random wallet mnemonic",
     (yargs) => {
       return yargs.positional("depth", {
@@ -73,7 +51,7 @@ yargs(hideBin(process.argv))
           })
           .positional("RPC", {
             describe: "RPC rpovider",
-            demandOption: true,
+            demandOption: false,
             type: "string",
           })
           .positional("contractAddress", {
@@ -84,8 +62,9 @@ yargs(hideBin(process.argv))
       );
     },
     async (argv) => {
-      console.log(typeof argv.arguments[2]);
-      const provider = new ethers.providers.JsonRpcProvider(argv.RPC);
+      const rpc = argv.RPC ?? process.env.RPC_URL;
+      if (!rpc) throw new Error("RPC must be set in --RPC or export RPC_URL");
+      const provider = new ethers.providers.JsonRpcProvider(rpc);
       const signer = new ethers.Wallet(argv.signer, provider);
       if (ethers.utils.isAddress(argv.contractAddress)) {
         const contract = new ethers.Contract(
@@ -183,19 +162,23 @@ yargs(hideBin(process.argv))
         .array("addresses")
         .string("addresses")
         .string("value")
-        .demandOption(["addresses", "value", "RPC", "signer"])
+        .demandOption(["addresses", "value", "signer"])
         .positional("value", {
           describe: "value to send to each address",
         })
         .positional("RPC", {
           describe: "RPC rpovider",
         })
-        .positional("signer", { describe: "signing wallet private key" });
+        .positional("signer", { describe: "signing wallet private key" })
+        .example(
+          "fundWallets --RPC $RPC_URL --addresses 0x2e8d906A63D15E110037DB42dD24FE69bEc4aFAf peersky.eth --value 10 --signer $SIGNER_KEY"
+        );
     },
     async (argv) => {
-      if (!argv.RPC) throw new Error("No RPC no fun");
+      const rpc = argv.RPC ?? process.env.RPC_URL;
+      if (!rpc) throw new Error("RPC must be set in --RPC or export RPC_URL");
       if (!argv.signer) throw new Error("No Signer no tx");
-      const provider = new ethers.providers.JsonRpcProvider(argv.RPC);
+      const provider = new ethers.providers.JsonRpcProvider(rpc);
       const seedingWallet = new ethers.Wallet(argv.signer, provider);
       console.log("argv.addresses", argv.addresses);
       for (const adr of argv.addresses) {
@@ -244,7 +227,10 @@ yargs(hideBin(process.argv))
           describe: "Make transfer instead of mint",
           type: "boolean",
         })
-        .demandOption(["addresses", "value", "contract", "signer"]);
+        .demandOption(["addresses", "value", "contract", "signer"])
+        .example(
+          "drop20 --value 100 --addresses 0x2e8d906A63D15E110037DB42dD24FE69bEc4aFAf vitalik.eth  --signer $SIGNER_KEY  --contract 0x21C68Aa0be617ebE09138d185BF2ff804131A8da"
+        );
     },
     async (argv) => {
       const rpc = argv.RPC ?? process.env.RPC_URL;
