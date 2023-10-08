@@ -30,6 +30,29 @@ yargs(hideBin(process.argv))
     }
   )
   .command(
+    "randomMnemonic",
+    "create random wallet mnemonic",
+    (yargs) => {
+      return yargs.positional("depth", {
+        describe: "number of accounts to generate",
+        default: 10,
+      });
+    },
+    (argv) => {
+      const wallet = ethers.Wallet.createRandom();
+      console.log("************MNEMONIC**************");
+      console.log(wallet.mnemonic);
+      for (let i = 0; i < argv.depth; i++) {
+        const walletIdx = ethers.Wallet.fromMnemonic(
+          wallet.mnemonic.phrase,
+          `m/44'/60'/0'/0/${i}`
+        );
+        console.log(walletIdx.address);
+      }
+      console.log("**********************************");
+    }
+  )
+  .command(
     "transaction",
     "create transaction",
     (yargs) => {
@@ -92,7 +115,6 @@ yargs(hideBin(process.argv))
     },
     (argv) => {
       const depth = argv.depth ?? 10;
-      console.log("argv.mnemonic", argv.mnemonic);
       const wallet = new ethers.Wallet.fromMnemonic(argv.mnemonic);
       for (let i = 0; i < depth; i++) {
         const walletIdx = ethers.Wallet.fromMnemonic(
@@ -184,6 +206,70 @@ yargs(hideBin(process.argv))
             value: ethers.utils.parseEther(argv.value),
           };
           promises.push(seedingWallet.sendTransaction(tx));
+        } else {
+          console.error("not an address:", adr);
+        }
+        await Promise.all(promises)
+          .then((results) => {
+            console.log("All done", results);
+          })
+          .catch((e) => {
+            console.error("Errors ", e);
+          });
+      }
+    }
+  )
+  .command(
+    "drop20",
+    "create erc20 airdrop",
+    (yargs) => {
+      return yargs
+        .positional("addresses", { describe: "addresses to send to" })
+        .array("addresses")
+        .string("addresses")
+        .string("value")
+        .positional("value", {
+          describe: "value to send to each address",
+        })
+        .positional("RPC", {
+          describe: "RPC rpovider (or set RPC_URL env)",
+        })
+        .positional("signer", { describe: "signing wallet private key" })
+        .positional("contract", {
+          describe: "contract address",
+          demandOption: true,
+          type: "string",
+        })
+        .option("transfer", {
+          describe: "Make transfer instead of mint",
+          type: "boolean",
+        })
+        .demandOption(["addresses", "value", "contract", "signer"]);
+    },
+    async (argv) => {
+      const rpc = argv.RPC ?? process.env.RPC_URL;
+      if (!rpc) throw new Error("RPC must be set in --RPC or export RPC_URL");
+      const abi = [
+        "function transfer(address to, uint256 value)",
+        "function mint(address to, uint256 value)",
+      ];
+      const provider = new ethers.providers.JsonRpcProvider(rpc);
+      const seedingWallet = new ethers.Wallet(argv.signer, provider);
+      const erc20Contract = new ethers.Contract(
+        argv.contract,
+        abi,
+        seedingWallet
+      );
+      const value = ethers.utils.parseEther(argv.value);
+      console.log("argv.addresses", argv.addresses);
+      for (const adr of argv.addresses) {
+        const promises = [];
+        if (ethers.utils.isAddress(adr)) {
+          promises.push(
+            argv.transfer
+              ? erc20Contract.transfer(adr, value)
+              : erc20Contract.mint(adr, value)
+          );
         } else {
           console.error("not an address:", adr);
         }
