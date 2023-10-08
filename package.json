@@ -1,6 +1,6 @@
 {
   "name": "ethscripts",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Useful scripts for interacting with ethers wallet",
   "main": "scripts.js",
   "author": "Tim Pechersky ",
