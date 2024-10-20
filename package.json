@@ -10,8 +10,8 @@
     "directory": "/"
   },
   "scripts": {
-    "version": "pnpm version",
-    "release": "pnpm release"
+    "version": "pnpm changeset version",
+    "release": "pnpm changeset release"
   },
   "bin": {
     "ethscripts": "./scripts.js"
