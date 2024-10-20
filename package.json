@@ -11,7 +11,7 @@
   },
   "scripts": {
     "version": "pnpm changeset version",
-    "release": "pnpm changeset release"
+    "release": "pnpm changeset publish"
   },
   "bin": {
     "ethscripts": "./scripts.js"
