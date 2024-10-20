@@ -20,10 +20,7 @@ yargs(hideBin(process.argv))
       console.log("************MNEMONIC**************");
       console.log(wallet.mnemonic);
       for (let i = 0; i < argv.depth; i++) {
-        const walletIdx = ethers.Wallet.fromMnemonic(
-          wallet.mnemonic.phrase,
-          `m/44'/60'/0'/0/${i}`
-        );
+        const walletIdx = ethers.Wallet.fromMnemonic(wallet.mnemonic.phrase, `m/44'/60'/0'/0/${i}`);
         console.log(walletIdx.address);
       }
       console.log("**********************************");
@@ -43,10 +40,7 @@ yargs(hideBin(process.argv))
       console.log("************MNEMONIC**************");
       console.log(wallet.mnemonic);
       for (let i = 0; i < argv.depth; i++) {
-        const walletIdx = ethers.Wallet.fromMnemonic(
-          wallet.mnemonic.phrase,
-          `m/44'/60'/0'/0/${i}`
-        );
+        const walletIdx = ethers.Wallet.fromMnemonic(wallet.mnemonic.phrase, `m/44'/60'/0'/0/${i}`);
         console.log(walletIdx.address);
       }
       console.log("**********************************");
@@ -88,11 +82,7 @@ yargs(hideBin(process.argv))
       const provider = new ethers.providers.JsonRpcProvider(argv.RPC);
       const signer = new ethers.Wallet(argv.signer, provider);
       if (ethers.utils.isAddress(argv.contractAddress)) {
-        const contract = new ethers.Contract(
-          argv.contractAddress,
-          [`function ${argv.signature}`],
-          signer
-        );
+        const contract = new ethers.Contract(argv.contractAddress, [`function ${argv.signature}`], signer);
         const tx = await contract.functions[argv.signature](...argv.arguments);
         console.log("transactions hash:", tx?.hash);
       } else {
@@ -117,25 +107,20 @@ yargs(hideBin(process.argv))
       const depth = argv.depth ?? 10;
       const wallet = new ethers.Wallet.fromMnemonic(argv.mnemonic);
       for (let i = 0; i < depth; i++) {
-        const walletIdx = ethers.Wallet.fromMnemonic(
-          wallet.mnemonic.phrase,
-          `m/44'/60'/0'/0/${i}`
-        );
+        const walletIdx = ethers.Wallet.fromMnemonic(wallet.mnemonic.phrase, `m/44'/60'/0'/0/${i}`);
         console.log(walletIdx.address);
       }
     }
   )
   .command(
-    "findPK",
+    "findPK <account>",
     "takes an account address and mnemonic and finds matching private key",
     (yargs) => {
       return yargs
-        .string("mnemonic")
-        .string("account")
-        .positional("account", { describe: "account PK of which need to find" })
+        .positional("account", { describe: "account PK of which need to find", type: "string" })
         .positional("mnemonic", {
-          describe:
-            "wallet mnemonic. Optionally you can set up MNEMONIC enviroment variable",
+          describe: "wallet mnemonic. Optionally you can set up MNEMONIC environment variable",
+          type: "string",
         })
         .positional("depth", {
           describe: "number of accounts check",
@@ -147,13 +132,10 @@ yargs(hideBin(process.argv))
       const depth = argv.depth ?? 10;
       const mnemonic = argv?.mnemonic ?? process.env?.MNEMONIC;
       if (!mnemonic) throw new Error("no mnemonic");
-      const wallet = new ethers.Wallet.fromMnemonic(argv.mnemonic);
+      const wallet = new ethers.Wallet.fromMnemonic(mnemonic);
       let finding;
       for (let i = 0; i < depth; i++) {
-        const walletIdx = ethers.Wallet.fromMnemonic(
-          wallet.mnemonic.phrase,
-          `m/44'/60'/0'/0/${i}`
-        );
+        const walletIdx = ethers.Wallet.fromMnemonic(wallet.mnemonic.phrase, `m/44'/60'/0'/0/${i}`);
         walletIdx.address == argv.account && (finding = walletIdx.privateKey);
       }
       console.log(finding ?? "Private key not found");
@@ -164,8 +146,8 @@ yargs(hideBin(process.argv))
     "Returns address from a given Private key",
     (yargs) => {
       return yargs.string("pk").positional("pk", {
-        describe:
-          "private key. Alternatively set PRIVATE_KEY enviroment variable",
+        describe: "private key. Alternatively set PRIVATE_KEY enviroment variable",
+        type: "string",
       });
     },
     (argv) => {
@@ -249,27 +231,16 @@ yargs(hideBin(process.argv))
     async (argv) => {
       const rpc = argv.RPC ?? process.env.RPC_URL;
       if (!rpc) throw new Error("RPC must be set in --RPC or export RPC_URL");
-      const abi = [
-        "function transfer(address to, uint256 value)",
-        "function mint(address to, uint256 value)",
-      ];
+      const abi = ["function transfer(address to, uint256 value)", "function mint(address to, uint256 value)"];
       const provider = new ethers.providers.JsonRpcProvider(rpc);
       const seedingWallet = new ethers.Wallet(argv.signer, provider);
-      const erc20Contract = new ethers.Contract(
-        argv.contract,
-        abi,
-        seedingWallet
-      );
+      const erc20Contract = new ethers.Contract(argv.contract, abi, seedingWallet);
       const value = ethers.utils.parseEther(argv.value);
       console.log("argv.addresses", argv.addresses);
       for (const adr of argv.addresses) {
         const promises = [];
         if (ethers.utils.isAddress(adr)) {
-          promises.push(
-            argv.transfer
-              ? erc20Contract.transfer(adr, value)
-              : erc20Contract.mint(adr, value)
-          );
+          promises.push(argv.transfer ? erc20Contract.transfer(adr, value) : erc20Contract.mint(adr, value));
         } else {
           console.error("not an address:", adr);
         }
