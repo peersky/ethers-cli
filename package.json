@@ -9,6 +9,10 @@
     "url": "https://github.com/peersky/ethers-cli.git",
     "directory": "/"
   },
+  "scripts": {
+    "version": "pnpm version",
+    "release": "pnpm release"
+  },
   "bin": {
     "ethscripts": "./scripts.js"
   },
