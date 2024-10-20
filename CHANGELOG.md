@@ -1,5 +1,11 @@
 # ethscripts
 
+## 1.5.0
+
+### Minor Changes
+
+- 8a85057: fixed find pk script
+
 ## 1.3.0
 
 ### Minor Changes
